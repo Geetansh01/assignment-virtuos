@@ -46,6 +46,12 @@ async function getDetails() {
     }
 }
 
+function sortByTotalMarks(student1, student2) {
+    let student1_total = parseFloat(student1.Round1Marks) + parseFloat(student1.Round2Marks) + parseFloat(student1.Round3Marks) + parseFloat(student1.TechnicalRoundMarks);
+    let student2_total = parseFloat(student2.Round1Marks) + parseFloat(student2.Round2Marks) + parseFloat(student2.Round3Marks) + parseFloat(student2.TechnicalRoundMarks);
+    return student2_total - student1_total;
+}
+
 async function main() {
     let totStudents = parseInt(await ask("Number of students: "));
 
@@ -66,15 +72,29 @@ async function main() {
 
     // Display all students with computed Total, Result and Rank
     let [rows] = await pool.query('SELECT * FROM student');
-    rows.forEach((row, i) => {
-        const total = row.Round1Marks + row.Round2Marks + row.Round3Marks + row.TechnicalRoundMarks;
+
+    rows.sort(sortByTotalMarks);
+    let rank = 1;
+    for(let i = 0; i < rows.length; i++){
+        // console.log(rows[i]);
+        const total = parseFloat(rows[i].Round1Marks) + parseFloat(rows[i].Round2Marks) + parseFloat(rows[i].Round3Marks) + parseFloat(rows[i].TechnicalRoundMarks);
+        rows[i].total = total;
+
+        //Get the rank
+        if(i > 0){
+            if(total !== rows[i-1].total){
+                rank++;
+            }
+        }
         const result = total < 35 ? "Rejected" : "Selected";
         console.log(
-            `#${i + 1} - Name: ${row.StudentName}, College: ${row.CollegeName}, Total: ${total}, Result: ${result}`
+            `#Rank: ${rank}  Name: ${rows[i].StudentName}, College: ${rows[i].CollegeName}, Total: ${total}, Result: ${result}`
         );
-    });
+    };
 
+    console.log("Closing!");
     rl.close();
+    await pool.end();
 }
 
 main();
