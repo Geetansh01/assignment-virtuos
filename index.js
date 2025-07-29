@@ -14,7 +14,7 @@ let pool = mysql.createPool({
     database: "school",
 }).promise();
 
-function ask(ques) {
+async function ask(ques) {
     return new Promise((resolve) => {
         rl.question(ques, ans => resolve(ans));
     });
@@ -53,7 +53,12 @@ function sortByTotalMarks(student1, student2) {
 }
 
 async function main() {
-    let totStudents = parseInt(await ask("Number of students: "));
+    let totStudents = undefined;
+
+    while(!Number.isInteger(totStudents)){
+        totStudents = await ask("Total Students: ")
+        totStudents = parseInt(totStudents);
+    }
 
     while (totStudents > 0) {
         let details = await getDetails();
@@ -92,7 +97,7 @@ async function main() {
         );
     };
 
-    console.log("Closing!");
+    console.log("Closing all connections!");
     rl.close();
     await pool.end();
 }
