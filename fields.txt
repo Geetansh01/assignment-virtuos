@@ -1,0 +1,9 @@
+DB: school
+table: student
+
+student( id, StudentName, CollegeName, Round1Marks, Round2Marks, Round3Marks, TechnicalRoundMarks, Total Marks, Result, Rank)
+
+//Rough
+no of students: loop
+
+//get all details in separate function
