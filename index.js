@@ -64,11 +64,16 @@ async function main() {
         let details = await getDetails();
         if (details !== false) {
             let [StudentName, CollegeName, Round1Marks, Round2Marks, Round3Marks, TechnicalRoundMarks] = details;
-
-            await pool.query(
-                'INSERT INTO student (StudentName, CollegeName, Round1Marks, Round2Marks, Round3Marks, TechnicalRoundMarks) VALUES (?, ?, ?, ?, ?, ?)',
-                [StudentName, CollegeName, Round1Marks, Round2Marks, Round3Marks, TechnicalRoundMarks]
-            );
+            
+            try{
+                await pool.query(
+                    'INSERT INTO student (StudentName, CollegeName, Round1Marks, Round2Marks, Round3Marks, TechnicalRoundMarks) VALUES (?, ?, ?, ?, ?, ?)',
+                    [StudentName, CollegeName, Round1Marks, Round2Marks, Round3Marks, TechnicalRoundMarks]
+                );
+            }
+            catch(err){
+                console.log("Error Connecting to DB");
+            }
 
             console.log("Inserted successfully");
             totStudents--;
@@ -76,26 +81,30 @@ async function main() {
     }
 
     // Display all students with computed Total, Result and Rank
-    let [rows] = await pool.query('SELECT * FROM student');
-
-    rows.sort(sortByTotalMarks);
-    let rank = 1;
-    for(let i = 0; i < rows.length; i++){
-        // console.log(rows[i]);
-        const total = parseFloat(rows[i].Round1Marks) + parseFloat(rows[i].Round2Marks) + parseFloat(rows[i].Round3Marks) + parseFloat(rows[i].TechnicalRoundMarks);
-        rows[i].total = total;
-
-        //Get the rank
-        if(i > 0){
-            if(total !== rows[i-1].total){
-                rank++;
+    try{
+        let [rows] = await pool.query('SELECT * FROM student');        
+        rows.sort(sortByTotalMarks);
+        let rank = 1;
+        for(let i = 0; i < rows.length; i++){
+            // console.log(rows[i]);
+            const total = parseFloat(rows[i].Round1Marks) + parseFloat(rows[i].Round2Marks) + parseFloat(rows[i].Round3Marks) + parseFloat(rows[i].TechnicalRoundMarks);
+            rows[i].total = total;
+            
+            //Get the rank
+            if(i > 0){
+                if(total !== rows[i-1].total){
+                    rank++;
+                }
             }
-        }
-        const result = total < 35 ? "Rejected" : "Selected";
-        console.log(
-            `#Rank: ${rank}  Name: ${rows[i].StudentName}, College: ${rows[i].CollegeName}, Total: ${total}, Result: ${result}`
-        );
-    };
+            const result = total < 35 ? "Rejected" : "Selected";
+            console.log(
+                `#Rank: ${rank}  Name: ${rows[i].StudentName}, College: ${rows[i].CollegeName}, Total: ${total}, Result: ${result}`
+            );
+        };
+    }
+    catch(err){
+        console.log("Error Connecting to DB");
+    }
 
     console.log("Closing all connections!");
     rl.close();
