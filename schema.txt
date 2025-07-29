@@ -1,0 +1,11 @@
+TABLE student (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  StudentName VARCHAR(30),
+  CollegeName VARCHAR(50),
+  Round1Marks DECIMAL(4,2),
+  Round2Marks DECIMAL(4,2),
+  Round3Marks DECIMAL(4,2),
+  TechnicalRoundMarks DECIMAL(4,2)
+);
+
+-- Not storing "rank" or "result" in db as these are derived attributes!
