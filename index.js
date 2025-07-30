@@ -23,7 +23,19 @@ async function ask(ques) {
 async function getDetails() {
     try {
         let StudentName = await ask("Enter StudentName: ");
+
+        while(StudentName.length > 30){
+            console.log("Student Name too long. Should be less than 30.");
+            StudentName = await ask("Enter StudentName: ");
+        }
+
         let CollegeName = await ask("Enter CollegeName: ");
+
+        while(CollegeName.length > 50){
+            console.log("College Name too long. Should be less than 50.");
+            CollegeName = await ask("Enter StudentName: ");
+        }
+
         let Round1Marks = parseFloat(await ask("Enter Round1Marks (0-10): "));
         let Round2Marks = parseFloat(await ask("Enter Round2Marks (0-10): "));
         let Round3Marks = parseFloat(await ask("Enter Round3Marks (0-10): "));
